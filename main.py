@@ -7,8 +7,8 @@ import time
 import requests
 
 
+# for BeautifulSoup scraping
 url = "https://appbrewery.github.io/Zillow-Clone/"
-
 headers = {
             "Accept-Language": "en-US,en;q=0.9,he;q=0.8,el;q=0.7,la;q=0.6",
             "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
@@ -20,6 +20,10 @@ headers = {
             "Sec-Fetch-Site": "cross-site",
             "Sec-Fetch-User": "?1"
             }
+
+# For selenium
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_experimental_option("detach", True)
 
 
 class HouseData:
@@ -60,7 +64,20 @@ class HouseData:
         return addresses
 
     def write_to_google_form(self, links, prices, addresses):
-        pass
+        driver = webdriver.Chrome(options=chrome_options)
+        driver.get("https://docs.google.com/forms/d/e/1FAIpQLSfH8mz2tul3bTYcub5vMOtnhrYLOeVeGgi3YVgf498YwXURKQ/viewform?usp=sf_link")
+        time.sleep(2)
+        for i in range(len(links)):
+            input_fields = driver.find_elements(By.CSS_SELECTOR, ".whsOnd")
+            input_fields[0].send_keys(addresses[i])
+            input_fields[1].send_keys(prices[i])
+            input_fields[2].send_keys(links[i])
+            # submit button
+            submit_button = driver.find_element(By.CSS_SELECTOR, ".lRwqcd .uArJ5e")
+            submit_button.click()
+            # submit another response
+            new_response_link = driver.find_element(By.XPATH, "/html/body/div[1]/div[2]/div[1]/div/div[4]/a")
+            new_response_link.click()
 
     def write_to_csv(self):
         pass
